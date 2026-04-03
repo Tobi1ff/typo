@@ -2,12 +2,39 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⌨️</text></svg>" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TYPO — Developer Social</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!-- PWA / App meta -->
+    <meta name="theme-color" content="#0a0a0a" />
+    <meta name="background-color" content="#0a0a0a" />
+    <meta name="application-name" content="Typo" />
+    <meta name="description" content="A social platform for developers to share code, showcase projects, and connect." />
+
+    <!-- iOS PWA -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Typo" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+
+    <!-- Android / Chrome -->
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-96.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-72.png" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Typo — Developer Social" />
+    <meta property="og:description" content="Share code, showcase projects, connect with developers." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/icons/icon-512.png" />
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;700;900&display=swap" rel="stylesheet" />
+
+    <title>TYPO — Developer Social</title>
   </head>
   <body>
     <div id="root"></div>

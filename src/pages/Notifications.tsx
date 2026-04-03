@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { User } from 'firebase/auth';
-import { collection, query, where, orderBy, onSnapshot, updateDoc, doc, writeBatch, limit } from 'firebase/firestore';
+import {
+  collection, query, where, orderBy, onSnapshot,
+  updateDoc, doc, writeBatch, limit,
+} from 'firebase/firestore';
 import { db, logError } from '../firebase';
 import { Bell, Heart, MessageSquare, UserPlus, CheckCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -12,6 +15,7 @@ interface Props { user: User; }
 export default function Notifications({ user }: Props) {
   const [notifs, setNotifs]   = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigate              = useNavigate();
 
   useEffect(() => {
     if (!db) { setLoading(false); return; }
@@ -19,7 +23,7 @@ export default function Notifications({ user }: Props) {
       collection(db, 'notifications'),
       where('recipientUid', '==', user.uid),
       orderBy('createdAt', 'desc'),
-      limit(50)
+      limit(60)
     );
     return onSnapshot(q, snap => {
       setNotifs(snap.docs.map(d => ({ id: d.id, ...d.data() })));
@@ -35,22 +39,38 @@ export default function Notifications({ user }: Props) {
   const markAllRead = async () => {
     if (!db) return;
     const batch = writeBatch(db);
-    notifs.filter(n => !n.read).forEach(n => batch.update(doc(db!, 'notifications', n.id), { read: true }));
+    notifs.filter(n => !n.read).forEach(n =>
+      batch.update(doc(db!, 'notifications', n.id), { read: true })
+    );
     await batch.commit().catch(err => logError('markAllRead', err));
   };
 
+  const handleClick = (n: any) => {
+    if (!n.read) markRead(n.id);
+    // Navigate to the relevant place
+    if (n.type === 'message' && n.convId) navigate(`/messages/${n.convId}`);
+    else if (n.type === 'follow' && n.senderUid) navigate(`/profile/${n.senderUid}`);
+    else if ((n.type === 'like' || n.type === 'comment') && n.senderUid) navigate(`/profile/${n.senderUid}`);
+  };
+
   const icon = (type: string) => {
-    if (type === 'like')    return <Heart size={15} className="text-red-400" />;
-    if (type === 'comment') return <MessageSquare size={15} className="text-blue-400" />;
-    if (type === 'follow')  return <UserPlus size={15} className="text-[#00ff00]" />;
-    return <Bell size={15} />;
+    switch (type) {
+      case 'like':    return <Heart size={15} className="text-red-400" />;
+      case 'comment': return <MessageSquare size={15} className="text-blue-400" />;
+      case 'follow':  return <UserPlus size={15} className="text-[#00ff00]" />;
+      case 'message': return <MessageSquare size={15} className="text-purple-400" />;
+      default:        return <Bell size={15} className="text-[#666]" />;
+    }
   };
 
   const message = (n: any) => {
-    if (n.type === 'like')    return 'liked your post';
-    if (n.type === 'comment') return 'commented on your post';
-    if (n.type === 'follow')  return 'started following you';
-    return 'sent you a notification';
+    switch (n.type) {
+      case 'like':    return 'liked your post';
+      case 'comment': return 'commented on your post';
+      case 'follow':  return 'started following you';
+      case 'message': return 'sent you a message';
+      default:        return 'sent you a notification';
+    }
   };
 
   const unread = notifs.filter(n => !n.read).length;
@@ -88,19 +108,31 @@ export default function Notifications({ user }: Props) {
               key={n.id}
               initial={{ opacity: 0, x: -8 }}
               animate={{ opacity: 1, x: 0 }}
-              onClick={() => !n.read && markRead(n.id)}
-              className={`flex items-center gap-4 p-4 border cursor-pointer transition-all ${n.read ? 'bg-[#0a0a0a] border-[#1a1a1a] opacity-50' : 'bg-[#111] border-[#00ff00]/20 hover:border-[#00ff00]/40'}`}
+              onClick={() => handleClick(n)}
+              className={`flex items-center gap-4 p-4 border cursor-pointer transition-all select-none
+                ${n.read
+                  ? 'bg-[#0a0a0a] border-[#1a1a1a] opacity-50'
+                  : 'bg-[#111] border-[#00ff00]/20 hover:border-[#00ff00]/40'
+                }`}
             >
-              <div className="p-2 bg-[#0a0a0a] border border-[#222] shrink-0">{icon(n.type)}</div>
+              <div className="p-2 bg-[#0a0a0a] border border-[#222] shrink-0">
+                {icon(n.type)}
+              </div>
+
               <div className="flex-1 min-w-0">
                 <p className="text-sm">
-                  <Link to={`/profile/${n.senderUid}`} className="font-bold text-white hover:text-[#00ff00]" onClick={e => e.stopPropagation()}>
+                  <Link
+                    to={`/profile/${n.senderUid}`}
+                    onClick={e => e.stopPropagation()}
+                    className="font-bold text-white hover:text-[#00ff00]"
+                  >
                     {n.senderName}
                   </Link>
                   <span className="text-[#777] ml-2 text-xs">{message(n)}</span>
                 </p>
                 <p className="text-[10px] font-mono text-[#444]">{formatDate(n.createdAt?.toDate())}</p>
               </div>
+
               {!n.read && <span className="w-2 h-2 bg-[#00ff00] rounded-full shrink-0" />}
             </motion.div>
           ))}

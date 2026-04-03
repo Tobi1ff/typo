@@ -28,6 +28,7 @@ export default function Auth() {
   const [mode, setMode]       = useState<Mode>('login');
   const [email, setEmail]     = useState('');
   const [password, setPass]   = useState('');
+  const [agreed, setAgreed]   = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -36,6 +37,7 @@ export default function Auth() {
 
   const handleGoogle = async () => {
     if (!auth) return;
+    if (mode === 'register' && !agreed) { setError('Please agree to the terms and conditions first.'); return; }
     setLoading(true); reset();
     try { await signInWithPopup(auth, new GoogleAuthProvider()); }
     catch (e) { setError(friendlyError(e)); }
@@ -45,6 +47,7 @@ export default function Auth() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!auth) return;
+    if (mode === 'register' && !agreed) { setError('Please agree to the terms and conditions first.'); return; }
     setLoading(true); reset();
     try {
       if (mode === 'reset') {
@@ -69,15 +72,7 @@ export default function Auth() {
         <div className="max-w-md w-full bg-[#111] border border-red-500/40 p-8 text-center space-y-4">
           <Terminal size={40} className="mx-auto text-red-500" />
           <h2 className="font-black text-white text-xl uppercase tracking-tighter">Firebase Not Configured</h2>
-          <p className="text-sm font-mono text-[#888]">
-            Add your Firebase credentials to <code className="text-[#00ff00]">.env</code> and redeploy.
-          </p>
-          <div className="text-left bg-[#0a0a0a] border border-[#222] p-4 font-mono text-[10px] text-[#666] space-y-1">
-            <p>VITE_FIREBASE_API_KEY=</p>
-            <p>VITE_FIREBASE_AUTH_DOMAIN=</p>
-            <p>VITE_FIREBASE_PROJECT_ID=</p>
-            <p>VITE_FIREBASE_APP_ID=</p>
-          </div>
+          <p className="text-sm font-mono text-[#888]">Add your Firebase credentials as environment variables and redeploy.</p>
         </div>
       </div>
     );
@@ -85,7 +80,7 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-[#0a0a0a] overflow-hidden relative">
-      {/* dot grid bg */}
+      {/* dot grid */}
       <div
         className="absolute inset-0 opacity-[0.06] pointer-events-none"
         style={{ backgroundImage: 'radial-gradient(#00ff00 1px, transparent 1px)', backgroundSize: '36px 36px' }}
@@ -114,7 +109,7 @@ export default function Auth() {
               {mode === 'reset' ? 'Reset Access' : mode === 'register' ? 'Register Identity' : 'Initialize Session'}
             </h2>
             <p className="text-xs text-[#666] mt-1">
-              {mode === 'reset' ? 'We\'ll send a reset link to your email.' : mode === 'register' ? 'Create your developer credentials.' : 'Connect your identity to the grid.'}
+              {mode === 'reset' ? "We'll send a reset link to your email." : mode === 'register' ? 'Create your developer credentials.' : 'Connect your identity to the grid.'}
             </p>
           </div>
 
@@ -146,9 +141,38 @@ export default function Auth() {
               </div>
             )}
 
+            {/* ── Terms — register only ── */}
+            {mode === 'register' && (
+              <label className="flex items-start gap-3 cursor-pointer group select-none">
+                <div className="relative mt-0.5 shrink-0">
+                  <input type="checkbox" checked={agreed} onChange={e => setAgreed(e.target.checked)} className="sr-only" />
+                  <div className={`w-4 h-4 border transition-all flex items-center justify-center ${agreed ? 'bg-[#00ff00] border-[#00ff00]' : 'bg-black border-[#444] group-hover:border-[#00ff00]'}`}>
+                    {agreed && (
+                      <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                        <path d="M1 4L3.5 6.5L9 1" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    )}
+                  </div>
+                </div>
+                <span className="text-[10px] font-mono text-[#666] leading-relaxed">
+                  I agree to the{' '}
+                  <a
+                    href="https://hungrydevevelopments.com/typo-privacy"
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={e => e.stopPropagation()}
+                    className="text-[#00ff00] hover:underline underline-offset-2"
+                  >
+                    terms and conditions
+                  </a>
+                  {' '}of Typo &amp; Hungry Developments
+                </span>
+              </label>
+            )}
+
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || (mode === 'register' && !agreed)}
               className="w-full flex items-center justify-center gap-2 bg-[#00ff00] text-black font-bold py-3 hover:bg-[#00cc00] disabled:opacity-50 transition-all active:scale-95 uppercase text-xs tracking-widest"
             >
               {mode === 'reset' ? <KeyRound size={14} /> : mode === 'register' ? <UserPlus size={14} /> : <LogIn size={14} />}
@@ -172,18 +196,23 @@ export default function Auth() {
 
               <button
                 onClick={handleGoogle}
-                disabled={loading}
+                disabled={loading || (mode === 'register' && !agreed)}
                 className="w-full relative flex items-center justify-center gap-2 bg-white text-black font-bold py-3 hover:bg-[#00ff00] transition-all active:scale-95 disabled:opacity-50 uppercase text-xs tracking-widest group"
               >
-                <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
                 {loading ? 'CONNECTING...' : 'SIGN IN WITH GOOGLE'}
                 <div className="absolute -bottom-1 -right-1 w-full h-full border border-white group-hover:border-[#00ff00] -z-10" />
               </button>
 
               <div className="text-center mt-4">
                 <button
-                  onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); reset(); }}
-                  className="text-[10px] font-mono text-[#555] hover:text-[#00ff00] uppercase tracking-widest transition-colors"
+                  onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); reset(); setAgreed(false); }}
+                  className="text-[10px] font-mono text-[#555] hover:text-[#00ff00] transition-colors uppercase tracking-widest"
                 >
                   {mode === 'login' ? 'Need an identity? Register' : 'Already registered? Login'}
                 </button>
@@ -191,7 +220,6 @@ export default function Auth() {
             </>
           )}
 
-          {/* Messages */}
           <AnimatePresence>
             {error && (
               <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
@@ -216,6 +244,24 @@ export default function Auth() {
             ))}
           </div>
         </div>
+
+        {/* ── Hungry Developments branding ── */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.9 }}
+          className="text-center mt-5 mb-2 text-[9px] font-mono text-[#2a2a2a] tracking-widest"
+        >
+          from{' '}
+          <a
+            href="https://hungrydevevelopments.com"
+            target="_blank"
+            rel="noreferrer"
+            className="hover:text-[#00ff00] transition-colors duration-300"
+          >
+            Hungry Developments
+          </a>
+        </motion.p>
       </motion.div>
     </div>
   );
