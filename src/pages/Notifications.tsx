@@ -55,21 +55,25 @@ export default function Notifications({ user }: Props) {
 
   const icon = (type: string) => {
     switch (type) {
-      case 'like':    return <Heart size={15} className="text-red-400" />;
-      case 'comment': return <MessageSquare size={15} className="text-blue-400" />;
-      case 'follow':  return <UserPlus size={15} className="text-[#00ff00]" />;
-      case 'message': return <MessageSquare size={15} className="text-purple-400" />;
-      default:        return <Bell size={15} className="text-[#666]" />;
+      case 'like':                return <Heart size={15} className="text-red-400" />;
+      case 'comment':             return <MessageSquare size={15} className="text-blue-400" />;
+      case 'follow':              return <UserPlus size={15} className="text-[#00ff00]" />;
+      case 'message':             return <MessageSquare size={15} className="text-purple-400" />;
+      case 'project_follow':      return <UserPlus size={15} className="text-yellow-400" />;
+      case 'project_contribute':  return <UserPlus size={15} className="text-orange-400" />;
+      default:                    return <Bell size={15} className="text-[#666]" />;
     }
   };
 
   const message = (n: any) => {
     switch (n.type) {
-      case 'like':    return 'liked your post';
-      case 'comment': return 'commented on your post';
-      case 'follow':  return 'started following you';
-      case 'message': return 'sent you a message';
-      default:        return 'sent you a notification';
+      case 'like':               return 'liked your post';
+      case 'comment':            return 'commented on your post';
+      case 'follow':             return 'started following you';
+      case 'message':            return 'sent you a message';
+      case 'project_follow':     return `is watching your project "${n.projectTitle || ''}"`;
+      case 'project_contribute': return `wants to contribute to "${n.projectTitle || ''}"`;
+      default:                   return 'sent you a notification';
     }
   };
 

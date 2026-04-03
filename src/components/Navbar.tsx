@@ -7,7 +7,7 @@ interface Props { user: User; }
 
 const navItems = (uid: string) => [
   { to: '/',              icon: Home,         label: 'Feed'     },
-  { to: '/projects',      icon: Layout,       label: 'Projects' },
+  { to: '/projects',      icon: Layout,       label: 'AllSafe' },
   { to: '/search',        icon: Search,       label: 'Search'   },
   { to: '/notifications', icon: Bell,         label: 'Alerts'   },
   { to: '/messages',      icon: MessageSquare,label: 'Messages' },
