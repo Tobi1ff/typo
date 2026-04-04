@@ -66,7 +66,7 @@ export default function Projects({ user }: Props) {
         <div>
           <div className="flex items-center gap-3 mb-1">
             <Shield size={28} className="text-[#00ff00]" />
-            <h1 className="text-4xl font-black tracking-tighter italic -skew-x-12 inline-block text-white">ALLSAFE</h1>
+            <h1 className="text-4xl font-black tracking-tighter italic -skew-x-12 inline-block text-white">DEV_SHOWCASE</h1>
           </div>
           <p className="text-[10px] font-mono text-[#00ff00] uppercase tracking-widest">
             // Post your project. Share your issue. Get help from the sector.
@@ -164,7 +164,7 @@ export default function Projects({ user }: Props) {
           ) : (
             <>
               <p className="text-lg font-bold text-[#444] uppercase tracking-widest mb-2">No Projects Found</p>
-              <p className="text-[#333] font-mono text-sm">Be the first to post to AllSafe.</p>
+              <p className="text-[#333] font-mono text-sm">Be the first to post to the hub.</p>
             </>
           )}
         </div>

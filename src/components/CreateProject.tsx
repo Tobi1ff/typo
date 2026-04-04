@@ -79,7 +79,7 @@ export default function CreateProject({ user, onClose }: Props) {
       >
         <div className="p-6 border-b border-[#222] flex items-center justify-between sticky top-0 bg-[#0d0d0d] z-10">
           <div>
-            <h2 className="font-black text-white uppercase tracking-tighter italic -skew-x-12 inline-block text-lg">POST TO ALLSAFE</h2>
+            <h2 className="font-black text-white uppercase tracking-tighter italic -skew-x-12 inline-block text-lg">POST YOUR PROJECT</h2>
             <p className="text-[9px] font-mono text-[#00ff00] uppercase tracking-widest mt-0.5">// Share your project & get help</p>
           </div>
           <button onClick={onClose} className="text-[#444] hover:text-white"><X size={20} /></button>
@@ -134,7 +134,7 @@ export default function CreateProject({ user, onClose }: Props) {
               required
               className="w-full bg-black border border-yellow-500/20 px-3 py-2.5 text-sm text-[#e0e0e0] focus:border-yellow-500/60 focus:outline-none min-h-[110px] resize-none placeholder-[#555]"
             />
-            <p className="text-[9px] font-mono text-[#555]">This is required — AllSafe is for getting help. Be specific so others can assist you.</p>
+            <p className="text-[9px] font-mono text-[#555]">This is required — This section is for getting help. Be specific so others can assist you.</p>
           </div>
 
           {/* Help tags */}
@@ -201,7 +201,7 @@ export default function CreateProject({ user, onClose }: Props) {
                 disabled={loading || !form.title.trim() || !form.issue.trim()}
                 className="bg-[#00ff00] text-black px-6 py-2 text-[10px] font-bold hover:bg-[#00cc00] disabled:opacity-40 uppercase tracking-widest"
               >
-                {loading ? 'POSTING...' : 'POST TO ALLSAFE'}
+                {loading ? 'POSTING...' : 'POST YOUR PROJECT'}
               </button>
             </div>
           </div>
